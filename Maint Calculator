@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Maintenance ROI Calculator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 40px; }
+        
+        /* Input Section */
+        .input-group { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
+        label { font-weight: 600; color: #34495e; }
+        input[type="number"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100px; font-size: 16px; }
+        
+        /* Button */
+        .btn { display: block; width: 100%; padding: 15px; background-color: #27ae60; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; transition: background 0.3s; margin-top: 20px; }
+        .btn:hover { background-color: #219150; }
+
+        /* Results Section */
+        #results { margin-top: 40px; padding-top: 20px; border-top: 2px solid #ecf0f1; display: none; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .comparison-table th, .comparison-table td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        .comparison-table th { background-color: #f9f9f9; }
+        .highlight { font-weight: bold; color: #27ae60; font-size: 1.2em; }
+        .ad-hoc-cost { color: #e74c3c; font-weight: bold; }
+        
+        .savings-box { background-color: #e8f8f5; border: 1px solid #27ae60; padding: 20px; text-align: center; border-radius: 8px; margin-top: 20px; }
+        .savings-amount { font-size: 2.5em; color: #27ae60; font-weight: bold; margin: 10px 0; }
+        .disclaimer { font-size: 0.85em; color: #7f8c8d; margin-top: 30px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Smart Home Maintenance ROI</h1>
+    <p class="subtitle">Compare your current ad-hoc repair costs against a predictable maintenance plan.</p>
+
+    <div class="input-group">
+        <label for="units">Total Units Managed:</label>
+        <input type="number" id="units" placeholder="e.g. 200" value="200">
+    </div>
+    <div class="input-group">
+        <label for="costPerWO">Current Cost per Work Order ($):</label>
+        <input type="number" id="costPerWO" value="35">
+    </div>
+    
+    <button class="btn" onclick="calculateROI()">Calculate Savings</button>
+
+    <div id="results">
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Current "Ad-Hoc" Approach</th>
+                    <th>Proposed Maintenance Plan</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Annual Cost</strong></td>
+                    <td class="ad-hoc-cost">$<span id="annualAdHoc">0</span></td>
+                    <td class="highlight">$<span id="annualPlan">0</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Cost Structure</strong></td>
+                    [cite_start]<td>Variable / Unpredictable [cite: 8]</td>
+                    [cite_start]<td>Fixed Flat Rate ($3.50/unit) [cite: 15]</td>
+                </tr>
+                <tr>
+                    <td><strong>Staff Time Wasted</strong></td>
+                    [cite_start]<td><span id="hoursWasted">0</span> Hours/Year [cite: 21]</td>
+                    <td><strong>0 Hours</strong> (We handle it)</td>
+                </tr>
+                <tr>
+                    <td><strong>Est. Hardware Risk</strong></td>
+                    <td>$<span id="hardwareRisk">0</span> Exposure</td>
+                    <td>Proactive Monitoring</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="savings-box">
+            <h3>Your Potential Annual Savings</h3>
+            <div class="savings-amount">$<span id="totalSavings">0</span></div>
+            <p>+ <span id="hoursSavedMain">0</span> hours of staff time reclaimed</p>
+        </div>
+        
+        <p class="disclaimer">
+            <strong>Sources & Assumptions:</strong><br>
+            [cite_start]• Ad-Hoc Volume: Based on industry standard of ~7 work orders per unit/year[cite: 2].<br>
+            [cite_start]• Plan Cost: Flat rate of $3.50 per unit/month[cite: 27].<br>
+            [cite_start]• Staff Time: Based on avg support call duration of 10.5 mins[cite: 22].<br>
+            [cite_start]• Hardware Risk: Estimated liability based on 5% error rate and ~$551 avg kit replacement cost[cite: 42, 43].
+        </p>
+    </div>
+</div>
+
+<script>
+    function calculateROI() {
+        // 1. Get Inputs
+        const units = parseFloat(document.getElementById('units').value);
+        const costPerWO = parseFloat(document.getElementById('costPerWO').value);
+        
+        // 2. Constants from Documents
+        const WO_PER_UNIT = 7; [cite_start]// [cite: 2]
+        const PLAN_COST_MONTHLY = 3.50; [cite_start]// [cite: 27]
+        const CALL_DURATION_MINS = 10.5; [cite_start]// [cite: 22]
+        const HARDWARE_FAILURE_RATE = 0.05; [cite_start]// [cite: 43]
+        const AVG_HARDWARE_KIT = 551; [cite_start]// [cite: 42]
+
+        // 3. Perform Calculations
+        // A. Current Ad-Hoc Cost
+        const annualAdHoc = units * WO_PER_UNIT * costPerWO;
+
+        // B. Plan Cost
+        const annualPlan = units * PLAN_COST_MONTHLY * 12;
+
+        // C. Savings
+        const savings = annualAdHoc - annualPlan;
+
+        // D. Time Savings (Hours)
+        const totalMinutes = units * WO_PER_UNIT * CALL_DURATION_MINS; // Assuming 1 call per WO for simplicity, or using the WO volume as proxy for "issues"
+        // Note: The doc extrapolates calls differently, but linking WO volume to time is a fair proxy for calculator simplicity.
+        // Let's stick to the specific "support calls" logic if possible, or use the WO volume. 
+        // Logic: The doc says 1400 errors = 1400 WOs. So we treat WO count as Error count.
+        const hoursWasted = Math.round(totalMinutes / 60);
+
+        // E. Hardware Risk
+        const risk = units * HARDWARE_FAILURE_RATE * AVG_HARDWARE_KIT;
+
+        // 4. Update UI
+        document.getElementById('annualAdHoc').innerText = annualAdHoc.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        document.getElementById('annualPlan').innerText = annualPlan.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        document.getElementById('hoursWasted').innerText = hoursWasted.toLocaleString();
+        document.getElementById('hoursSavedMain').innerText = hoursWasted.toLocaleString();
+        document.getElementById('hardwareRisk').innerText = risk.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        
+        const savingsElement = document.getElementById('totalSavings');
+        savingsElement.innerText = savings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // Color coding for savings (Red if negative, Green if positive)
+        if (savings < 0) {
+            savingsElement.style.color = "#e74c3c"; // Red
+        } else {
+            savingsElement.style.color = "#27ae60"; // Green
+        }
+
+        // Show Results
+        document.getElementById('results').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
